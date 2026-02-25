@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Tarefa - Chaplin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="../index.html" class="text-2xl font-bold text-orange-500">Chaplin</a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="dashboard.html" class="text-gray-700 hover:text-orange-500">Dashboard</a>
+                    <a href="tarefas.html" class="text-gray-700 hover:text-orange-500">Tarefas</a>
+                    <a href="nova-tarefa.html" class="text-orange-500 font-semibold">Nova Tarefa</a>
+                </div>
+                <button id="mobile-menu-btn" class="md:hidden text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Criar Nova Tarefa</h1>
+            <p class="text-gray-600 mt-2">Preencha os detalhes da nova tarefa abaixo</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <form class="space-y-6">
+                <!-- Title Input -->
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
+                        Título da Tarefa *
+                    </label>
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        placeholder="Digite o título da tarefa"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        required
+                    >
+                </div>
+
+                <!-- Description Textarea -->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                        Descrição
+                    </label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="5"
+                        placeholder="Descreva os detalhes da tarefa"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    ></textarea>
+                </div>
+
+                <!-- Two Column Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Priority Select -->
+                    <div>
+                        <label for="priority" class="block text-sm font-medium text-gray-700 mb-2">
+                            Prioridade
+                        </label>
+                        <select
+                            id="priority"
+                            name="priority"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        >
+                            <option value="">Selecione a prioridade</option>
+                            <option value="baixa">Baixa</option>
+                            <option value="media">Média</option>
+                            <option value="alta">Alta</option>
+                            <option value="urgente">Urgente</option>
+                        </select>
+                    </div>
+
+                    <!-- Due Date Input -->
+                    <div>
+                        <label for="due-date" class="block text-sm font-medium text-gray-700 mb-2">
+                            Data de Vencimento
+                        </label>
+                        <input
+                            type="date"
+                            id="due-date"
+                            name="due-date"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        >
+                    </div>
+                </div>
+
+                <!-- Responsible Person -->
+                <div>
+                    <label for="responsible" class="block text-sm font-medium text-gray-700 mb-2">
+                        Responsável
+                    </label>
+                    <select
+                        id="responsible"
+                        name="responsible"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    >
+                        <option value="">Selecione o responsável</option>
+                        <option value="joao">João Silva</option>
+                        <option value="maria">Maria Santos</option>
+                        <option value="pedro">Pedro Oliveira</option>
+                        <option value="ana">Ana Costa</option>
+                    </select>
+                </div>
+
+                <!-- Tags Input -->
+                <div>
+                    <label for="tags" class="block text-sm font-medium text-gray-700 mb-2">
+                        Tags (separadas por vírgula)
+                    </label>
+                    <input
+                        type="text"
+                        id="tags"
+                        name="tags"
+                        placeholder="design, desenvolvimento, teste"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    >
+                </div>
+
+                <!-- Checkbox -->
+                <div class="flex items-center">
+                    <input
+                        type="checkbox"
+                        id="notify"
+                        name="notify"
+                        class="rounded border-gray-300 text-orange-500"
+                    >
+                    <label for="notify" class="ml-2 text-sm text-gray-600">
+                        Notificar o responsável quando a tarefa for criada
+                    </label>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+                    <button
+                        type="submit"
+                        class="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition"
+                    >
+                        Criar Tarefa
+                    </button>
+                    <button
+                        type="reset"
+                        class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg transition"
+                    >
+                        Limpar
+                    </button>
+                    <a
+                        href="tarefas.html"
+                        class="flex-1 border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-semibold py-2 px-4 rounded-lg transition text-center"
+                    >
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>
