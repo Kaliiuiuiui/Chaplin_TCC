@@ -44,7 +44,7 @@ pip install -r requirements.txt
 
 ```sql
 CREATE DATABASE chaplin_db;
-CREATE USER 'chaplin_user'@'localhost' IDENTIFIED BY 'sua_senha';
+CREATE USER 'chaplin_user'@'localhost' IDENTIFIED BY 'admin123';
 GRANT ALL PRIVILEGES ON chaplin_db.* TO 'chaplin_user'@'localhost';
 FLUSH PRIVILEGES;
 ```
