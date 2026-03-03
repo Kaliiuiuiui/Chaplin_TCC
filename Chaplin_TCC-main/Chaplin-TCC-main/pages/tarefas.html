@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarefas - Chaplin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="../index.html" class="text-2xl font-bold text-orange-500">Chaplin</a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="dashboard.html" class="text-gray-700 hover:text-orange-500">Dashboard</a>
+                    <a href="tarefas.html" class="text-orange-500 font-semibold">Tarefas</a>
+                    <a href="nova-tarefa.html" class="text-gray-700 hover:text-orange-500">Nova Tarefa</a>
+                </div>
+                <button id="mobile-menu-btn" class="md:hidden text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Page Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Tarefas</h1>
+                <p class="text-gray-600 mt-2">Gerencie todas as suas tarefas</p>
+            </div>
+            <a href="nova-tarefa.html" class="mt-4 md:mt-0 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-6 rounded-lg transition">
+                + Nova Tarefa
+            </a>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Search Input -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
+                    <input
+                        type="text"
+                        placeholder="Buscar tarefa..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    >
+                </div>
+
+                <!-- Status Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <option value="">Todos</option>
+                        <option value="pendente">Pendente</option>
+                        <option value="progresso">Em Progresso</option>
+                        <option value="concluida">Concluída</option>
+                    </select>
+                </div>
+
+                <!-- Priority Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Prioridade</label>
+                    <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <option value="">Todas</option>
+                        <option value="baixa">Baixa</option>
+                        <option value="media">Média</option>
+                        <option value="alta">Alta</option>
+                        <option value="urgente">Urgente</option>
+                    </select>
+                </div>
+
+                <!-- Responsible Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Responsável</label>
+                    <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <option value="">Todos</option>
+                        <option value="joao">João Silva</option>
+                        <option value="maria">Maria Santos</option>
+                        <option value="pedro">Pedro Oliveira</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tasks Table (Desktop) -->
+        <div class="hidden md:block bg-white rounded-lg shadow-md overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gray-100 border-b border-gray-200">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Título</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Prioridade</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Responsável</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Vencimento</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <!-- Task Row 1 -->
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 text-sm text-gray-900">Design da página inicial</td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">Em Progresso</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold">Alta</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">Maria Santos</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">2024-12-15</td>
+                        <td class="px-6 py-4 text-sm">
+                            <button class="text-orange-500 hover:text-orange-600 mr-3">Editar</button>
+                            <button class="text-red-500 hover:text-red-600">Deletar</button>
+                        </td>
+                    </tr>
+
+                    <!-- Task Row 2 -->
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 text-sm text-gray-900">Implementar autenticação</td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">Pendente</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold">Urgente</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">João Silva</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">2024-12-10</td>
+                        <td class="px-6 py-4 text-sm">
+                            <button class="text-orange-500 hover:text-orange-600 mr-3">Editar</button>
+                            <button class="text-red-500 hover:text-red-600">Deletar</button>
+                        </td>
+                    </tr>
+
+                    <!-- Task Row 3 -->
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 text-sm text-gray-900">Testes de usabilidade</td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">Concluída</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">Média</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">Pedro Oliveira</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">2024-12-08</td>
+                        <td class="px-6 py-4 text-sm">
+                            <button class="text-orange-500 hover:text-orange-600 mr-3">Editar</button>
+                            <button class="text-red-500 hover:text-red-600">Deletar</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tasks Cards (Mobile) -->
+        <div class="md:hidden space-y-4">
+            <!-- Task Card 1 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Design da página inicial</h3>
+                    <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">Em Progresso</span>
+                </div>
+                <div class="space-y-2 mb-4">
+                    <p class="text-sm text-gray-600"><strong>Responsável:</strong> Maria Santos</p>
+                    <p class="text-sm text-gray-600"><strong>Vencimento:</strong> 2024-12-15</p>
+                    <p class="text-sm"><span class="inline-block bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold">Alta Prioridade</span></p>
+                </div>
+                <div class="flex gap-2">
+                    <button class="flex-1 text-orange-500 hover:bg-orange-50 py-2 rounded">Editar</button>
+                    <button class="flex-1 text-red-500 hover:bg-red-50 py-2 rounded">Deletar</button>
+                </div>
+            </div>
+
+            <!-- Task Card 2 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Implementar autenticação</h3>
+                    <span class="inline-block bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-semibold">Pendente</span>
+                </div>
+                <div class="space-y-2 mb-4">
+                    <p class="text-sm text-gray-600"><strong>Responsável:</strong> João Silva</p>
+                    <p class="text-sm text-gray-600"><strong>Vencimento:</strong> 2024-12-10</p>
+                    <p class="text-sm"><span class="inline-block bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold">Urgente</span></p>
+                </div>
+                <div class="flex gap-2">
+                    <button class="flex-1 text-orange-500 hover:bg-orange-50 py-2 rounded">Editar</button>
+                    <button class="flex-1 text-red-500 hover:bg-red-50 py-2 rounded">Deletar</button>
+                </div>
+            </div>
+
+            <!-- Task Card 3 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Testes de usabilidade</h3>
+                    <span class="inline-block bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold">Concluída</span>
+                </div>
+                <div class="space-y-2 mb-4">
+                    <p class="text-sm text-gray-600"><strong>Responsável:</strong> Pedro Oliveira</p>
+                    <p class="text-sm text-gray-600"><strong>Vencimento:</strong> 2024-12-08</p>
+                    <p class="text-sm"><span class="inline-block bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-semibold">Média Prioridade</span></p>
+                </div>
+                <div class="flex gap-2">
+                    <button class="flex-1 text-orange-500 hover:bg-orange-50 py-2 rounded">Editar</button>
+                    <button class="flex-1 text-red-500 hover:bg-red-50 py-2 rounded">Deletar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>
