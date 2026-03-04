@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chaplin - Plataforma de Tarefas</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body class="bg-white text-gray-900">
     <!-- Navegação -->
@@ -19,10 +20,10 @@
 
                 <!-- Menu Desktop -->
                 <div class="hidden md:flex space-x-8">
-                    <a href="/" class="text-gray-700 hover:text-orange-500 transition">Home</a>
-                    <a href="/docs/" class="text-gray-700 hover:text-orange-500 transition">Documentação</a>
-                    <a href="/demo/" class="text-gray-700 hover:text-orange-500 transition">Demonstração</a>
-                    <a href="/users/login/" class="text-gray-700 hover:text-orange-500 transition">Login</a>
+                    <a href="{% url 'core:index' %}" class="text-gray-700 hover:text-orange-500 transition">Home</a>
+                    <a href="#" class="text-gray-700 hover:text-orange-500 transition">Documentação</a>
+                    <a href="#" class="text-gray-700 hover:text-orange-500 transition">Demonstração</a>
+                    <a href="{% url 'users:login' %}" class="text-gray-700 hover:text-orange-500 transition">Login</a>
                 </div>
 
                 <!-- Botão do Menu Mobile -->
@@ -35,10 +36,10 @@
 
             <!-- Menu Mobile -->
             <div id="mobile-menu" class="hidden md:hidden pb-4">
-                <a href="/" class="block px-2 py-2 text-gray-700 hover:text-orange-500">Home</a>
-                <a href="/docs/" class="block px-2 py-2 text-gray-700 hover:text-orange-500">Documentação</a>
-                <a href="/demo/" class="block px-2 py-2 text-gray-700 hover:text-orange-500">Demonstração</a>
-                <a href="/users/login/" class="block px-2 py-2 text-gray-700 hover:text-orange-500">Login</a>
+                <a href="{% url 'core:index' %}" class="block px-2 py-2 text-gray-700 hover:text-orange-500">Home</a>
+                <a href="#" class="block px-2 py-2 text-gray-700 hover:text-orange-500">Documentação</a>
+                <a href="#" class="block px-2 py-2 text-gray-700 hover:text-orange-500">Demonstração</a>
+                <a href="{% url 'users:login' %}" class="block px-2 py-2 text-gray-700 hover:text-orange-500">Login</a>
             </div>
         </div>
     </nav>
@@ -65,10 +66,10 @@
                         Centralize a comunicação, organize tarefas e acompanhe o progresso de manutenção com uma plataforma intuitiva e poderosa.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                        <a href="/users/login/" class="inline-block bg-white text-orange-600 hover:bg-gray-100 font-bold py-4 px-8 rounded-lg transition transform hover:scale-105 shadow-lg text-center">
+                        <a href="{% url 'users:login' %}" class="inline-block bg-white text-orange-600 hover:bg-gray-100 font-bold py-4 px-8 rounded-lg transition transform hover:scale-105 shadow-lg text-center">
                             Começar Agora
                         </a>
-                        <a href="/demo/" class="inline-block border-2 border-white text-white hover:bg-white hover:text-orange-600 font-bold py-4 px-8 rounded-lg transition text-center">
+                        <a href="#" class="inline-block border-2 border-white text-white hover:bg-white hover:text-orange-600 font-bold py-4 px-8 rounded-lg transition text-center">
                             Ver Demonstração
                         </a>
                     </div>
@@ -167,7 +168,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="text-3xl md:text-4xl font-bold mb-6">Pronto para começar?</h2>
             <p class="text-lg mb-8">Junte-se a milhares de usuários que já estão gerenciando suas tarefas com Chaplin.</p>
-            <a href="pages/login.html" class="inline-block bg-white text-orange-500 hover:bg-gray-100 font-semibold py-3 px-8 rounded-lg transition">
+            <a href="{% url 'users:login' %}" class="inline-block bg-white text-orange-500 hover:bg-gray-100 font-semibold py-3 px-8 rounded-lg transition">
                 Fazer Login
             </a>
         </div>
@@ -211,6 +212,6 @@
         </div>
     </footer>
 
-    <script src="js/main.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>

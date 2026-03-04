@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from decouple import config
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -70,11 +71,18 @@ WSGI_APPLICATION = 'chaplin_project.wsgi.application'
 
 # Database
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': config(
+        'DATABASE_URL',
+        default=f'sqlite:///{BASE_DIR}/db.sqlite3',
+        cast=dj_database_url.parse
+    )
 }
+
+# Authentication Backends
+AUTHENTICATION_BACKENDS = [
+    'apps.users.backends.EmailOrUsernameModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

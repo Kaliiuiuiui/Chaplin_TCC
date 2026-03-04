@@ -1,6 +1,8 @@
-Django==4.2.0
-mysqlclient==2.2.0
+Django==6.0.3
+mysqlclient==2.2.8
 python-decouple==3.8
-Pillow==10.4.0
-django-crispy-forms==2.0
-crispy-bootstrap5==0.7
+Pillow==12.1.1
+django-crispy-forms==2.6
+Crispy-bootstrap5==2025.6
+dj-database-url==2.1.0
+psycopg2-binary==2.9.9
