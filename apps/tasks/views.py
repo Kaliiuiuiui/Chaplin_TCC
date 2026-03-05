@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import Task, TaskEvidence, Message
+from .models import Task, TaskEvidence, Message, AreaPredio
 from .forms import TaskForm
 from apps.users.models import UserProfile
 from django.db.models import Q
@@ -203,3 +203,163 @@ def settings_view(request):
         'user_profile': user_profile,
     }
     return render(request, 'tasks/settings.html', context)
+
+
+@login_required
+def kanban_view(request):
+    """Visualização Kanban de Tarefas por Status"""
+    if not hasattr(request.user, 'profile'):
+        UserProfile.objects.create(user=request.user, role='admin' if request.user.is_superuser else 'colaborador')
+    user_profile = request.user.profile
+
+    # Filtrar tarefas baseado no role do usuário
+    if user_profile.role == 'gestor':
+        all_tasks = Task.objects.filter(created_by=request.user)
+    elif user_profile.role == 'colaborador':
+        all_tasks = Task.objects.filter(assigned_to=request.user)
+    else:
+        all_tasks = Task.objects.all()
+
+    context = {
+        'tarefas_abertas': all_tasks.filter(status='aberta').select_related('assigned_to', 'created_by'),
+        'tarefas_alocadas': all_tasks.filter(status='alocada').select_related('assigned_to', 'created_by'),
+        'tarefas_concluidas': all_tasks.filter(status='concluida').select_related('assigned_to', 'created_by'),
+        'tarefas_finalizadas': all_tasks.filter(status='finalizada').select_related('assigned_to', 'created_by'),
+    }
+    return render(request, 'tasks/kanban.html', context)
+
+
+@login_required
+def calendar_view(request):
+    """Visualização Calendário de Tarefas por Data de Vencimento"""
+    from datetime import date
+    import json
+
+    if not hasattr(request.user, 'profile'):
+        UserProfile.objects.create(user=request.user, role='admin' if request.user.is_superuser else 'colaborador')
+    user_profile = request.user.profile
+
+    # Filtrar tarefas com due_date baseado no role
+    if user_profile.role == 'gestor':
+        tasks_with_dates = Task.objects.filter(created_by=request.user, due_date__isnull=False)
+    elif user_profile.role == 'colaborador':
+        tasks_with_dates = Task.objects.filter(assigned_to=request.user, due_date__isnull=False)
+    else:
+        tasks_with_dates = Task.objects.filter(due_date__isnull=False)
+
+    # Preparar eventos para o FullCalendar (formato JSON)
+    events = []
+    for task in tasks_with_dates:
+        # Cor baseada na prioridade
+        color_map = {
+            'urgente': '#ef4444',  # red
+            'alta': '#f97316',     # orange
+            'normal': '#3b82f6',   # blue
+            'baixa': '#22c55e',    # green
+        }
+        color = color_map.get(task.priority, '#6b7280')
+
+        events.append({
+            'id': task.pk,
+            'title': task.title,
+            'start': task.due_date.isoformat(),
+            'url': f'/tasks/{task.pk}/',
+            'backgroundColor': color,
+            'borderColor': color,
+        })
+
+    context = {
+        'events_json': json.dumps(events),
+    }
+    return render(request, 'tasks/calendar.html', context)
+
+
+# ─────────────────────────────────────
+# GESTÃO DE ÁREAS DO PRÉDIO (GESTOR)
+# ─────────────────────────────────────
+
+def _is_gestor_or_admin(user):
+    """Verifica se o usuário é Gestor ou Admin."""
+    profile = getattr(user, 'profile', None)
+    return profile and profile.role in ('gestor', 'admin')
+
+
+@login_required
+def area_list_view(request):
+    """Lista todas as áreas do prédio."""
+    if not _is_gestor_or_admin(request.user):
+        return redirect('tasks:dashboard')
+    areas = AreaPredio.objects.all()
+    return render(request, 'tasks/area_list.html', {'areas': areas})
+
+
+@login_required
+def area_create_view(request):
+    """Cria uma nova área do prédio."""
+    if not _is_gestor_or_admin(request.user):
+        return redirect('tasks:dashboard')
+    from django.contrib.auth.models import User as AuthUser
+
+    if request.method == 'POST':
+        nome = request.POST.get('nome', '').strip()
+        descricao = request.POST.get('descricao', '').strip()
+        andar = request.POST.get('andar', '').strip()
+        responsavel_id = request.POST.get('responsavel')
+        ativo = request.POST.get('ativo') == 'on'
+
+        if not nome:
+            return render(request, 'tasks/area_form.html', {
+                'error': 'O nome da área é obrigatório.',
+                'users': AuthUser.objects.all(),
+                'form_action': 'create',
+            })
+
+        responsavel = AuthUser.objects.filter(pk=responsavel_id).first() if responsavel_id else None
+        AreaPredio.objects.create(
+            nome=nome, descricao=descricao, andar=andar,
+            responsavel=responsavel, ativo=ativo
+        )
+        return redirect('tasks:area_list')
+
+    return render(request, 'tasks/area_form.html', {
+        'users': AuthUser.objects.all(),
+        'form_action': 'create',
+    })
+
+
+@login_required
+def area_edit_view(request, pk):
+    """Edita uma área do prédio."""
+    if not _is_gestor_or_admin(request.user):
+        return redirect('tasks:dashboard')
+    from django.contrib.auth.models import User as AuthUser
+
+    area = get_object_or_404(AreaPredio, pk=pk)
+
+    if request.method == 'POST':
+        area.nome = request.POST.get('nome', area.nome).strip()
+        area.descricao = request.POST.get('descricao', area.descricao).strip()
+        area.andar = request.POST.get('andar', area.andar).strip()
+        responsavel_id = request.POST.get('responsavel')
+        area.responsavel = AuthUser.objects.filter(pk=responsavel_id).first() if responsavel_id else None
+        area.ativo = request.POST.get('ativo') == 'on'
+        area.save()
+        return redirect('tasks:area_list')
+
+    return render(request, 'tasks/area_form.html', {
+        'area': area,
+        'users': AuthUser.objects.all(),
+        'form_action': 'edit',
+    })
+
+
+@login_required
+def area_delete_view(request, pk):
+    """Desativa (soft-delete) ou exclui uma área do prédio."""
+    if not _is_gestor_or_admin(request.user):
+        return redirect('tasks:dashboard')
+    area = get_object_or_404(AreaPredio, pk=pk)
+    if request.method == 'POST':
+        area.delete()
+        return redirect('tasks:area_list')
+    return render(request, 'tasks/area_confirm_delete.html', {'area': area})

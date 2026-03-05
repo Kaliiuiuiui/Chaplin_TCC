@@ -13,4 +13,11 @@ urlpatterns = [
     path('<int:pk>/assign/', views.assign_task_view, name='assign'),
     path('<int:pk>/complete/', views.complete_task_view, name='complete'),
     path('<int:pk>/message/', views.add_message_view, name='add_message'),
+    path('kanban/', views.kanban_view, name='kanban'),
+    path('calendario/', views.calendar_view, name='calendar'),
+    # Áreas do Prédio
+    path('areas/', views.area_list_view, name='area_list'),
+    path('areas/nova/', views.area_create_view, name='area_create'),
+    path('areas/<int:pk>/editar/', views.area_edit_view, name='area_edit'),
+    path('areas/<int:pk>/excluir/', views.area_delete_view, name='area_delete'),
 ]

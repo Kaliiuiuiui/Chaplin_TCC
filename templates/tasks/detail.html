@@ -1,4 +1,4 @@
-{% extends "base_dashboard.html" %}
+{% extends "shared/base_dashboard.html" %}
 {% block title %}{{ task.title }} - Chaplin{% endblock %}
 {% block content %}
 <div class="p-6 md:p-8">
@@ -92,10 +92,26 @@
                         <p class="font-semibold text-gray-900">{{ task.assigned_to.first_name|default:task.assigned_to.username }}</p>
                     </div>
                     {% endif %}
-                    {% if task.location %}
-                    <div>
+            {% if task.location or task.endereco_completo %}
+                     <div>
                         <p class="text-sm text-gray-600">Localização</p>
+                        {% if task.location %}
                         <p class="font-semibold text-gray-900">{{ task.location }}</p>
+                        {% endif %}
+                        {% if task.endereco_completo %}
+                        <div class="mt-1 text-sm text-gray-700 space-y-0.5">
+                            {% if task.logradouro %}
+                            <p>{{ task.logradouro }}{% if task.numero %}, {{ task.numero }}{% endif %}{% if task.complemento %} — {{ task.complemento }}{% endif %}</p>
+                            {% endif %}
+                            {% if task.bairro %}<p class="text-gray-500">{{ task.bairro }}</p>{% endif %}
+                            {% if task.cidade %}<p class="text-gray-500">{{ task.cidade }}{% if task.estado %} - {{ task.estado }}{% endif %}</p>{% endif %}
+                            {% if task.cep %}<p class="text-gray-400 text-xs">CEP {{ task.cep }}</p>{% endif %}
+                            <a href="https://www.google.com/maps/search/?api=1&query={{ task.endereco_completo|urlencode }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-xs text-orange-500 hover:text-orange-600 mt-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                Ver no Google Maps
+                            </a>
+                        </div>
+                        {% endif %}
                     </div>
                     {% endif %}
                     {% if task.due_date %}

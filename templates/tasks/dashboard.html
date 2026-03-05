@@ -1,118 +1,117 @@
-<!-- Main Content -->
-<main class="flex-1 overflow-auto">
-            <div class="p-4 sm:p-6 lg:p-8">
-                <!-- Page Header -->
-                <div class="mb-8">
-                    <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Dashboard</h1>
-                    <p class="text-gray-600 mt-2">Bem-vindo de volta, Usuário!</p>
+{% extends "shared/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Dashboard - Chaplin{% endblock %}
+
+{% block content %}
+<div class="p-4 sm:p-6 lg:p-8">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Dashboard</h1>
+        <p class="text-gray-600 mt-2">Bem-vindo de volta, {{ user.first_name|default:user.username }}!</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Stat Card 1 -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm">Total de Tarefas</p>
+                    <p class="text-3xl font-bold text-gray-900">24</p>
                 </div>
-
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <!-- Stat Card 1 -->
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-600 text-sm">Total de Tarefas</p>
-                                <p class="text-3xl font-bold text-gray-900">24</p>
-                            </div>
-                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
-                                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H3a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V6a1 1 0 00-1-1h-3a1 1 0 000-2 2 2 0 00-2-2H4z" clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Stat Card 2 -->
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-600 text-sm">Em Progresso</p>
-                                <p class="text-3xl font-bold text-gray-900">8</p>
-                            </div>
-                            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                                <svg class="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Stat Card 3 -->
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-600 text-sm">Concluídas</p>
-                                <p class="text-3xl font-bold text-gray-900">12</p>
-                            </div>
-                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                                <svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Stat Card 4 -->
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-600 text-sm">Atrasadas</p>
-                                <p class="text-3xl font-bold text-gray-900">4</p>
-                            </div>
-                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                                <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 2.523a6 6 0 018.367 8.367zM9 11a3 3 0 110-6 3 3 0 010 6zm6.707-3.707a1 1 0 00-1.414-1.414L11 8.586 9.707 7.293a1 1 0 00-1.414 1.414L9.586 10l-1.293 1.293a1 1 0 001.414 1.414L11 11.414l1.293 1.293a1 1 0 001.414-1.414L12.414 11l1.293-1.293z" clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Tasks -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-6">Tarefas Recentes</h2>
-                    <div class="space-y-4">
-                        <!-- Task Item 1 -->
-                        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-                            <div class="flex items-center gap-4 flex-1">
-                                <input type="checkbox" class="rounded border-gray-300 text-orange-500">
-                                <div>
-                                    <p class="font-semibold text-gray-900">Design da página inicial</p>
-                                    <p class="text-sm text-gray-600">Maria Santos • 2024-12-15</p>
-                                </div>
-                            </div>
-                            <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold">Alta</span>
-                        </div>
-
-                        <!-- Task Item 2 -->
-                        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-                            <div class="flex items-center gap-4 flex-1">
-                                <input type="checkbox" class="rounded border-gray-300 text-orange-500">
-                                <div>
-                                    <p class="font-semibold text-gray-900">Implementar autenticação</p>
-                                    <p class="text-sm text-gray-600">João Silva • 2024-12-10</p>
-                                </div>
-                            </div>
-                            <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold">Urgente</span>
-                        </div>
-
-                        <!-- Task Item 3 -->
-                        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-                            <div class="flex items-center gap-4 flex-1">
-                                <input type="checkbox" class="rounded border-gray-300 text-orange-500">
-                                <div>
-                                    <p class="font-semibold text-gray-900">Testes de usabilidade</p>
-                                    <p class="text-sm text-gray-600">Pedro Oliveira • 2024-12-08</p>
-                                </div>
-                            </div>
-                            <span class="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">Média</span>
-                        </div>
-                    </div>
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H3a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V6a1 1 0 00-1-1h-3a1 1 0 000-2 2 2 0 00-2-2H4z" clip-rule="evenodd"></path>
+                    </svg>
                 </div>
             </div>
+        </div>
+
+        <!-- Stat Card 2 -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm">Em Progresso</p>
+                    <p class="text-3xl font-bold text-gray-900">8</p>
+                </div>
+                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stat Card 3 -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm">Concluídas</p>
+                    <p class="text-3xl font-bold text-gray-900">12</p>
+                </div>
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stat Card 4 -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm">Atrasadas</p>
+                    <p class="text-3xl font-bold text-gray-900">4</p>
+                </div>
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 2.523a6 6 0 018.367 8.367zM9 11a3 3 0 110-6 3 3 0 010 6zm6.707-3.707a1 1 0 00-1.414-1.414L11 8.586 9.707 7.293a1 1 0 00-1.414 1.414L9.586 10l-1.293 1.293a1 1 0 001.414 1.414L11 11.414l1.293 1.293a1 1 0 001.414-1.414L12.414 11l1.293-1.293z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Tasks -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-gray-900">Tarefas Recentes</h2>
+            <a href="{% url 'tasks:list' %}" class="text-sm text-orange-500 hover:text-orange-600 font-medium">Ver todas →</a>
+        </div>
+        <div class="space-y-4">
+            {% for task in tasks|slice:":5" %}
+            <a href="{% url 'tasks:detail' task.pk %}" class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                <div class="flex items-center gap-4 flex-1">
+                    <div>
+                        <p class="font-semibold text-gray-900">{{ task.title }}</p>
+                        <p class="text-sm text-gray-600">
+                            {{ task.assigned_to.get_full_name|default:task.assigned_to.username|default:"Sem responsável" }}
+                            {% if task.due_date %} • {{ task.due_date|date:"d/m/Y" }}{% endif %}
+                        </p>
+                    </div>
+                </div>
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ml-4
+                    {% if task.priority == 'urgente' %}bg-red-100 text-red-800
+                    {% elif task.priority == 'alta' %}bg-orange-100 text-orange-800
+                    {% elif task.priority == 'normal' %}bg-blue-100 text-blue-800
+                    {% else %}bg-green-100 text-green-800{% endif %}">
+                    {{ task.get_priority_display }}
+                </span>
+            </a>
+            {% empty %}
+            <div class="text-center py-10 text-gray-400">
+                <svg class="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+                <p class="text-sm font-medium">Nenhuma tarefa cadastrada ainda.</p>
+                <a href="{% url 'tasks:create' %}" class="inline-block mt-4 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold py-2 px-5 rounded-lg transition">+ Criar Primeira Tarefa</a>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
+
 {% endblock %}

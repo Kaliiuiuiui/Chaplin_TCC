@@ -1,0 +1,78 @@
+{% extends "shared/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Áreas do Prédio - Chaplin{% endblock %}
+
+{% block content %}
+<div class="p-4 sm:p-6 lg:p-8">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Áreas do Prédio</h1>
+            <p class="text-gray-500 mt-1">Gerencie os setores e locais do prédio</p>
+        </div>
+        <a href="{% url 'tasks:area_create' %}" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-5 rounded-lg transition flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Nova Área
+        </a>
+    </div>
+
+    {% if messages %}
+    <div class="mb-6 space-y-2">
+        {% for message in messages %}
+        <div class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Areas Grid -->
+    {% if areas %}
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {% for area in areas %}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
+            <div class="flex items-start justify-between mb-3">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">{{ area.nome }}</h3>
+                    {% if area.andar %}
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full mt-1 inline-block">{{ area.andar }}</span>
+                    {% endif %}
+                </div>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if area.ativo %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-500{% endif %}">
+                    {% if area.ativo %}Ativa{% else %}Inativa{% endif %}
+                </span>
+            </div>
+            {% if area.descricao %}
+            <p class="text-sm text-gray-600 mb-4">{{ area.descricao|truncatechars:100 }}</p>
+            {% endif %}
+            {% if area.responsavel %}
+            <p class="text-xs text-gray-400 mb-4">
+                <span class="font-medium text-gray-600">Responsável:</span>
+                {{ area.responsavel.get_full_name|default:area.responsavel.username }}
+            </p>
+            {% endif %}
+            <div class="flex gap-2 pt-3 border-t border-gray-100">
+                <p class="text-xs text-gray-400 flex-1">
+                    <span class="font-medium">{{ area.tarefas.count }}</span> tarefa{{ area.tarefas.count|pluralize }}
+                </p>
+                <a href="{% url 'tasks:area_edit' area.pk %}" class="text-xs text-orange-600 hover:text-orange-800 font-medium px-3 py-1 border border-orange-200 rounded-lg hover:bg-orange-50 transition">Editar</a>
+                <a href="{% url 'tasks:area_delete' area.pk %}" class="text-xs text-red-600 hover:text-red-800 font-medium px-3 py-1 border border-red-200 rounded-lg hover:bg-red-50 transition">Excluir</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-20 bg-white rounded-xl border border-dashed border-gray-300">
+        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+        </svg>
+        <h3 class="text-lg font-semibold text-gray-600 mb-2">Nenhuma área cadastrada</h3>
+        <p class="text-gray-400 mb-6">Comece criando as áreas e setores do seu prédio.</p>
+        <a href="{% url 'tasks:area_create' %}" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-6 rounded-lg transition inline-block">
+            + Criar Primeira Área
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

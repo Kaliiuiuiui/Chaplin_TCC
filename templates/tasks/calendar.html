@@ -1,0 +1,96 @@
+{% extends "shared/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Calendário - Chaplin{% endblock %}
+
+{% block content %}
+<div class="p-4 sm:p-6 lg:p-8">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Calendário de Tarefas</h1>
+            <p class="text-gray-500 mt-1">Visualize os vencimentos das suas tarefas</p>
+        </div>
+        <!-- View Toggle -->
+        <div class="flex items-center bg-white rounded-lg shadow-sm border border-gray-200 p-1">
+            <a href="{% url 'tasks:list' %}" class="flex items-center gap-2 px-4 py-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition text-sm font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                Lista
+            </a>
+            <a href="{% url 'tasks:kanban' %}" class="flex items-center gap-2 px-4 py-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition text-sm font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path></svg>
+                Kanban
+            </a>
+            <a href="{% url 'tasks:calendar' %}" class="flex items-center gap-2 px-4 py-2 rounded-md bg-orange-500 text-white transition text-sm font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                Calendário
+            </a>
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="flex flex-wrap gap-4 mb-6">
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+            <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span> Urgente
+        </div>
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+            <span class="w-3 h-3 rounded-full bg-orange-500 inline-block"></span> Alta
+        </div>
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+            <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span> Normal
+        </div>
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+            <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span> Baixa
+        </div>
+    </div>
+
+    <!-- Calendar Container -->
+    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+        <div id="calendar"></div>
+    </div>
+</div>
+
+<!-- FullCalendar CSS & JS via CDN -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+        const events = {{ events_json|safe }};
+
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'pt-br',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listMonth'
+            },
+            buttonText: {
+                today: 'Hoje',
+                month: 'Mês',
+                week: 'Semana',
+                list: 'Lista'
+            },
+            events: events,
+            eventClick: function(info) {
+                info.jsEvent.preventDefault();
+                if (info.event.url) {
+                    window.location.href = info.event.url;
+                }
+            },
+            eventDidMount: function(info) {
+                // Tooltip on hover
+                info.el.title = info.event.title;
+            },
+            height: 'auto',
+            dayMaxEvents: 3,
+            moreLinkText: function(n) { return '+' + n + ' mais'; },
+            noEventsText: 'Nenhuma tarefa com data de vencimento cadastrada.',
+        });
+
+        calendar.render();
+    });
+</script>
+{% endblock %}

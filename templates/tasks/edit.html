@@ -1,21 +1,21 @@
 {% extends "shared/base_dashboard.html" %}
 {% load static %}
 
-{% block title %}Nova Tarefa - Chaplin{% endblock %}
+{% block title %}Editar Tarefa - Chaplin{% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <!-- Page Header -->
     <div class="mb-8">
-        <a href="{% url 'tasks:list' %}" class="text-orange-500 hover:text-orange-600 font-medium text-sm inline-flex items-center gap-1 mb-4">
+        <a href="{% url 'tasks:detail' task.pk %}" class="text-orange-500 hover:text-orange-600 font-medium text-sm inline-flex items-center gap-1 mb-4">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             Voltar
         </a>
-        <h1 class="text-3xl font-bold text-gray-900">Criar Nova Tarefa</h1>
-        <p class="text-gray-600 mt-2">Preencha os detalhes da nova tarefa abaixo</p>
+        <h1 class="text-3xl font-bold text-gray-900">Editar Tarefa</h1>
+        <p class="text-gray-600 mt-2">#{{ task.pk }} — {{ task.title }}</p>
     </div>
 
-    <form method="POST" action="{% url 'tasks:create' %}" class="space-y-6">
+    <form method="POST" action="{% url 'tasks:edit' task.pk %}" class="space-y-6">
         {% csrf_token %}
 
         {% if form.errors %}
@@ -58,10 +58,9 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Local / Setor (Interno)</label>
                 {{ form.location }}
-                <p class="text-xs text-gray-400 mt-1">Ex: Sala 302, Corredor B, Telhado — opcional se for informar o endereço completo</p>
+                <p class="text-xs text-gray-400 mt-1">Ex: Sala 302, Corredor B, Telhado</p>
             </div>
 
-            <!-- CEP + ViaCEP -->
             <div class="border-t border-dashed border-gray-200 pt-5">
                 <p class="text-sm font-semibold text-gray-700 mb-3">📍 Endereço Completo (via CEP)</p>
 
@@ -108,9 +107,9 @@
         <!-- Actions -->
         <div class="flex flex-col sm:flex-row gap-4">
             <button type="submit" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition">
-                Criar Tarefa
+                Salvar Alterações
             </button>
-            <a href="{% url 'tasks:list' %}" class="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-lg transition text-center">
+            <a href="{% url 'tasks:detail' task.pk %}" class="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-lg transition text-center">
                 Cancelar
             </a>
         </div>
