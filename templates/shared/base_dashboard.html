@@ -190,13 +190,15 @@
                     <span>Tarefas</span>
                 </a>
 
-                <!-- Nova Tarefa -->
+                <!-- Nova Tarefa (somente gestores, líderes e admins) -->
+                {% if user.profile.role != 'colaborador' %}
                 <a href="{% url 'tasks:create' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium {% if request.resolver_match.url_name == 'create' %}bg-orange-500 text-white{% else %}text-gray-300 hover:bg-gray-800 hover:text-white{% endif %} transition">
                     <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
                     </svg>
                     <span>Nova Tarefa</span>
                 </a>
+                {% endif %}
 
                 <!-- Kanban -->
                 <a href="{% url 'tasks:kanban' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium {% if request.resolver_match.url_name == 'kanban' %}bg-orange-500 text-white{% else %}text-gray-300 hover:bg-gray-800 hover:text-white{% endif %} transition">

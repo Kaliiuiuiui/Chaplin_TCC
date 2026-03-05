@@ -88,7 +88,7 @@
                     <div>
                         <p class="font-semibold text-gray-900">{{ task.title }}</p>
                         <p class="text-sm text-gray-600">
-                            {{ task.assigned_to.get_full_name|default:task.assigned_to.username|default:"Sem responsável" }}
+                            {% if task.assigned_to %}{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}{% else %}Sem responsável{% endif %}
                             {% if task.due_date %} • {{ task.due_date|date:"d/m/Y" }}{% endif %}
                         </p>
                     </div>

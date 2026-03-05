@@ -59,7 +59,7 @@
                 {% if task.assigned_to %}
                 <div class="flex items-center gap-1.5 mt-3 pt-2 border-t border-gray-100">
                     <div class="w-5 h-5 bg-orange-400 rounded-full flex items-center justify-center text-white text-xs font-bold">{{ task.assigned_to.username|make_list|first|upper }}</div>
-                    <span class="text-xs text-gray-500">{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</span>
+                    <span class="text-xs text-gray-500">{% if task.assigned_to %}{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}{% else %}Sem responsável{% endif %}</span>
                 </div>
                 {% endif %}
             </a>
@@ -99,7 +99,7 @@
                 {% if task.assigned_to %}
                 <div class="flex items-center gap-1.5 mt-3 pt-2 border-t border-gray-100">
                     <div class="w-5 h-5 bg-blue-400 rounded-full flex items-center justify-center text-white text-xs font-bold">{{ task.assigned_to.username|make_list|first|upper }}</div>
-                    <span class="text-xs text-gray-500">{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</span>
+                    <span class="text-xs text-gray-500">{% if task.assigned_to %}{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}{% else %}Sem responsável{% endif %}</span>
                 </div>
                 {% endif %}
             </a>

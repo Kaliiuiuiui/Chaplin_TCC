@@ -6,6 +6,7 @@ from .forms import TaskForm
 from apps.users.models import UserProfile
 from django.db.models import Q
 from django.contrib.auth.models import User as AuthUser
+from django.contrib import messages as django_messages
 
 
 def _notify(recipient, titulo, mensagem='', tipo='sistema', task=None):
@@ -18,6 +19,16 @@ def _notify(recipient, titulo, mensagem='', tipo='sistema', task=None):
             tipo=tipo,
             task=task,
         )
+
+
+def _get_role(user):
+    """Retorna o role do usuário ou 'colaborador' como padrão."""
+    return getattr(getattr(user, 'profile', None), 'role', 'colaborador')
+
+
+def _is_manager(user):
+    """True para admin, gestor e lider (quem pode criar/editar/alocar tarefas)."""
+    return _get_role(user) in ('admin', 'gestor', 'lider')
 
 @login_required
 def dashboard_view(request):
@@ -89,7 +100,10 @@ def tasks_list_view(request):
 
 @login_required
 def create_task_view(request):
-    """View para criar nova tarefa"""
+    """View para criar nova tarefa — restrito a gestor/admin/líder."""
+    if not _is_manager(request.user):
+        django_messages.error(request, 'Você não tem permissão para criar tarefas.')
+        return redirect('tasks:list')
     if request.method == 'POST':
         form = TaskForm(request.POST, request.FILES)
         if form.is_valid():
@@ -104,25 +118,36 @@ def create_task_view(request):
             return redirect('tasks:detail', pk=task.pk)
     else:
         form = TaskForm()
-    
+
     return render(request, 'tasks/create.html', {'form': form})
 
 @login_required
 def task_detail_view(request, pk):
-    """View do detalhe da tarefa"""
+    """View do detalhe da tarefa.
+    Colaboradores só podem ver tarefas atribuídas a eles.
+    """
     task = get_object_or_404(Task, pk=pk)
-    messages = task.messages.all()
+    role = _get_role(request.user)
+    # Colaboradores só acessam tarefas suas
+    if role == 'colaborador' and task.assigned_to != request.user:
+        django_messages.error(request, 'Você não tem acesso a esta tarefa.')
+        return redirect('tasks:list')
+    task_messages = task.messages.all()
     evidences = task.evidences.all()
-    
+
     return render(request, 'tasks/detail.html', {
         'task': task,
-        'messages': messages,
+        'messages': task_messages,
         'evidences': evidences,
+        'can_manage': _is_manager(request.user),
     })
 
 @login_required
 def edit_task_view(request, pk):
-    """View para editar tarefa"""
+    """View para editar tarefa — restrito a gestor/admin/líder."""
+    if not _is_manager(request.user):
+        django_messages.error(request, 'Você não tem permissão para editar tarefas.')
+        return redirect('tasks:detail', pk=pk)
     task = get_object_or_404(Task, pk=pk)
     
     if request.method == 'POST':
@@ -137,7 +162,10 @@ def edit_task_view(request, pk):
 
 @login_required
 def assign_task_view(request, pk):
-    """View para alocar tarefa a um usuário"""
+    """View para alocar tarefa — restrito a gestor/admin/líder."""
+    if not _is_manager(request.user):
+        django_messages.error(request, 'Você não tem permissão para alocar tarefas.')
+        return redirect('tasks:detail', pk=pk)
     task = get_object_or_404(Task, pk=pk)
     
     if request.method == 'POST':
