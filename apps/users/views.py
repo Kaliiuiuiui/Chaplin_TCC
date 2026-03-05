@@ -15,6 +15,9 @@ def login_view(request):
         if user is not None:
             login(request, user)
             return redirect('tasks:dashboard')
+        else:
+            return render(request, 'users/login.html', {'error': 'Usuário ou senha inválidos. Tente novamente.'})
+            
     return render(request, 'users/login.html')
 
 def logout_view(request):
