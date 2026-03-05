@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Usuário - Chaplin Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-50 flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-900 text-white flex-shrink-0 flex flex-col">
+        <div class="p-6 border-b border-gray-800">
+            <a href="{% url 'core:index' %}" class="text-2xl font-bold text-orange-500">Chaplin Adm</a>
+        </div>
+        <nav class="flex-1 overflow-y-auto p-4 space-y-2">
+            <a href="{% url 'tasks:dashboard' %}" class="flex items-center gap-3 px-4 py-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                Dashboard Geral
+            </a>
+            <a href="{% url 'users:admin_users_list' %}" class="flex items-center gap-3 px-4 py-2 bg-orange-500 text-white rounded-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                Gestão de Usuários
+            </a>
+        </nav>
+        <div class="p-4 border-t border-gray-800">
+            <a href="{% url 'users:logout' %}" class="flex items-center gap-3 px-4 py-2 text-red-400 hover:bg-gray-800 rounded-lg transition">
+                Sair do Painel
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto w-full">
+        <div class="p-8">
+            <!-- Header -->
+            <div class="flex items-center gap-4 mb-8">
+                <a href="{% url 'users:admin_users_list' %}" class="text-gray-500 hover:text-gray-900 border border-gray-300 rounded-lg p-2 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </a>
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Editar Usuário</h1>
+                    <p class="text-gray-600 mt-1">Alterando dados para: {{ target_user.get_full_name|default:target_user.username }}</p>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 max-w-4xl">
+                <form method="POST" id="editUserForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="currentRole" value="{{ target_user.profile.role }}">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <!-- Profile/Access Configuration -->
+                        <div class="col-span-1 md:col-span-2 bg-orange-50 p-6 rounded-lg border border-orange-100 mb-2">
+                            <h3 class="text-lg font-bold text-orange-800 mb-4 border-b border-orange-200 pb-2">Nível de Acesso (Papel do Sistema)</h3>
+                            <div>
+                                <label for="role" class="block text-sm font-medium text-gray-700 mb-2">Selecione o Nível</label>
+                                <select id="role" name="role" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                                    {% for value, label in roles %}
+                                        <option value="{{ value }}" {% if target_user.profile.role == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                <p class="text-xs text-orange-600 mt-2 flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                                    Qualquer alteração neste campo ficará registrada na tabela de Auditoria para fins administrativos, e afeta diretamente as views permitidas.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Basic Data -->
+                        <div>
+                            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">Nome</label>
+                            <input type="text" id="first_name" name="first_name" value="{{ target_user.first_name }}" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">Sobrenome</label>
+                            <input type="text" id="last_name" name="last_name" value="{{ target_user.last_name }}" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" id="email" name="email" value="{{ target_user.email }}" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                        </div>
+
+                        <!-- Especialidade -->
+                        <div class="md:col-span-2">
+                            <label for="especialidade" class="block text-sm font-medium text-gray-700 mb-2">Especialidade (Opcional)</label>
+                            <select id="especialidade" name="especialidade" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                                <option value="">Sem especialidade específica</option>
+                                {% for esp in especialidades %}
+                                    <option value="{{ esp.id }}" {% if target_user.profile.especialidade.id == esp.id %}selected{% endif %}>{{ esp.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t border-gray-200 flex justify-end gap-4">
+                        <a href="{% url 'users:admin_users_list' %}" class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-lg font-medium transition">Cancelar</a>
+                        <button type="button" id="submitBtn" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium shadow-sm transition">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('submitBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = document.getElementById('editUserForm');
+            const selectRole = document.getElementById('role').value;
+            const currentRole = document.getElementById('currentRole').value;
+            const roleSelectText = document.getElementById('role').options[document.getElementById('role').selectedIndex].text;
+
+            if (selectRole !== currentRole) {
+                Swal.fire({
+                    title: 'Alteração de Nível',
+                    text: `Tem certeza que deseja alterar o papel deste usuário para "${roleSelectText}"? Esta ação será auditada.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#f97316',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Sim, alterar prioridade',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            } else {
+                form.submit();
+            }
+        });
+    </script>
+</body>
+</html>

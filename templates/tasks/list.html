@@ -43,51 +43,51 @@
 
         <!-- Filters Section -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <form method="GET" action="{% url 'tasks:list' %}" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                 <!-- Search Input -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
+                <div class="md:col-span-2">
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
                     <input
                         type="text"
-                        placeholder="Buscar tarefa..."
+                        name="search"
+                        id="search"
+                        value="{{ current_search }}"
+                        placeholder="Buscar por título, descrição ou local..."
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                     >
                 </div>
 
                 <!-- Status Filter -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                    <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select name="status" id="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
                         <option value="">Todos</option>
-                        <option value="pendente">Pendente</option>
-                        <option value="progresso">Em Progresso</option>
-                        <option value="concluida">Concluída</option>
+                        <option value="aberta" {% if current_status == 'aberta' %}selected{% endif %}>Aberta</option>
+                        <option value="alocada" {% if current_status == 'alocada' %}selected{% endif %}>Alocada</option>
+                        <option value="concluida" {% if current_status == 'concluida' %}selected{% endif %}>Concluída</option>
+                        <option value="finalizada" {% if current_status == 'finalizada' %}selected{% endif %}>Finalizada</option>
                     </select>
                 </div>
 
                 <!-- Priority Filter -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Prioridade</label>
-                    <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <label for="priority" class="block text-sm font-medium text-gray-700 mb-2">Prioridade</label>
+                    <select name="priority" id="priority" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
                         <option value="">Todas</option>
-                        <option value="baixa">Baixa</option>
-                        <option value="media">Média</option>
-                        <option value="alta">Alta</option>
-                        <option value="urgente">Urgente</option>
+                        <option value="baixa" {% if current_priority == 'baixa' %}selected{% endif %}>Baixa</option>
+                        <option value="normal" {% if current_priority == 'normal' %}selected{% endif %}>Normal</option>
+                        <option value="alta" {% if current_priority == 'alta' %}selected{% endif %}>Alta</option>
+                        <option value="urgente" {% if current_priority == 'urgente' %}selected{% endif %}>Urgente</option>
                     </select>
                 </div>
 
-                <!-- Responsible Filter -->
+                <!-- Filter Button -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Responsável</label>
-                    <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                        <option value="">Todos</option>
-                        <option value="joao">João Silva</option>
-                        <option value="maria">Maria Santos</option>
-                        <option value="pedro">Pedro Oliveira</option>
-                    </select>
+                    <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition h-[42px]">
+                        Filtrar
+                    </button>
                 </div>
-            </div>
+            </form>
         </div>
 
         <!-- Tasks Table (Desktop) -->
@@ -104,112 +104,89 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                    <!-- Task Row 1 -->
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-4 text-sm text-gray-900">Design da página inicial</td>
-                        <td class="px-6 py-4 text-sm">
-                            <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">Em Progresso</span>
+                    {% for task in tasks %}
+                    <tr class="hover:bg-gray-50 transition cursor-pointer" onclick="window.location.href='{% url 'tasks:detail' task.pk %}'">
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-medium text-gray-900">{{ task.title }}</div>
+                            <div class="text-xs text-gray-500 truncate max-w-xs">{{ task.description|truncatewords:10 }}</div>
                         </td>
                         <td class="px-6 py-4 text-sm">
-                            <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold">Alta</span>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Maria Santos</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">2024-12-15</td>
-                        <td class="px-6 py-4 text-sm">
-                            <button class="text-orange-500 hover:text-orange-600 mr-3">Editar</button>
-                            <button class="text-red-500 hover:text-red-600">Deletar</button>
-                        </td>
-                    </tr>
-
-                    <!-- Task Row 2 -->
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-4 text-sm text-gray-900">Implementar autenticação</td>
-                        <td class="px-6 py-4 text-sm">
-                            <span class="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">Pendente</span>
+                            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold
+                                {% if task.status == 'aberta' %} bg-green-100 text-green-800
+                                {% elif task.status == 'alocada' %} bg-blue-100 text-blue-800
+                                {% elif task.status == 'concluida' %} bg-gray-100 text-gray-800
+                                {% elif task.status == 'finalizada' %} bg-purple-100 text-purple-800
+                                {% endif %}">
+                                {{ task.get_status_display }}
+                            </span>
                         </td>
                         <td class="px-6 py-4 text-sm">
-                            <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold">Urgente</span>
+                            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold
+                                {% if task.priority == 'baixa' %} bg-blue-100 text-blue-800
+                                {% elif task.priority == 'normal' %} bg-green-100 text-green-800
+                                {% elif task.priority == 'alta' %} bg-orange-100 text-orange-800
+                                {% elif task.priority == 'urgente' %} bg-red-100 text-red-800
+                                {% endif %}">
+                                {{ task.get_priority_display }}
+                            </span>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">João Silva</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">2024-12-10</td>
-                        <td class="px-6 py-4 text-sm">
-                            <button class="text-orange-500 hover:text-orange-600 mr-3">Editar</button>
-                            <button class="text-red-500 hover:text-red-600">Deletar</button>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            {{ task.assigned_to.get_full_name|default:task.assigned_to.username|default:"Não Alocada" }}
                         </td>
-                    </tr>
-
-                    <!-- Task Row 3 -->
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-4 text-sm text-gray-900">Testes de usabilidade</td>
-                        <td class="px-6 py-4 text-sm">
-                            <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">Concluída</span>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            {{ task.due_date|date:"d/m/Y"|default:"-" }}
                         </td>
                         <td class="px-6 py-4 text-sm">
-                            <span class="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">Média</span>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Pedro Oliveira</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">2024-12-08</td>
-                        <td class="px-6 py-4 text-sm">
-                            <button class="text-orange-500 hover:text-orange-600 mr-3">Editar</button>
-                            <button class="text-red-500 hover:text-red-600">Deletar</button>
+                            <a href="{% url 'tasks:detail' task.pk %}" class="text-orange-500 hover:text-orange-600 font-semibold">Acessar</a>
                         </td>
                     </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">Nenhuma tarefa encontrada com os filtros selecionados.</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
 
         <!-- Tasks Cards (Mobile) -->
         <div class="md:hidden space-y-4">
-            <!-- Task Card 1 -->
-            <div class="bg-white rounded-lg shadow-md p-6">
+            {% for task in tasks %}
+            <div class="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition" onclick="window.location.href='{% url 'tasks:detail' task.pk %}'">
                 <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Design da página inicial</h3>
-                    <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">Em Progresso</span>
+                    <h3 class="text-lg font-semibold text-gray-900 border-b pb-2 mb-2">{{ task.title }}</h3>
+                    <span class="inline-block px-2 py-1 rounded text-xs font-semibold
+                        {% if task.status == 'aberta' %} bg-green-100 text-green-800
+                        {% elif task.status == 'alocada' %} bg-blue-100 text-blue-800
+                        {% elif task.status == 'concluida' %} bg-gray-100 text-gray-800
+                        {% elif task.status == 'finalizada' %} bg-purple-100 text-purple-800
+                        {% endif %}">
+                        {{ task.get_status_display }}
+                    </span>
                 </div>
                 <div class="space-y-2 mb-4">
-                    <p class="text-sm text-gray-600"><strong>Responsável:</strong> Maria Santos</p>
-                    <p class="text-sm text-gray-600"><strong>Vencimento:</strong> 2024-12-15</p>
-                    <p class="text-sm"><span class="inline-block bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold">Alta Prioridade</span></p>
+                    <p class="text-sm text-gray-600"><strong>Responsável:</strong> {{ task.assigned_to.get_full_name|default:task.assigned_to.username|default:"Não Alocada" }}</p>
+                    <p class="text-sm text-gray-600"><strong>Vencimento:</strong> {{ task.due_date|date:"d/m/Y"|default:"-" }}</p>
+                    <p class="text-sm">
+                        <span class="inline-block px-2 py-1 rounded text-xs font-semibold
+                            {% if task.priority == 'baixa' %} bg-blue-100 text-blue-800
+                            {% elif task.priority == 'normal' %} bg-green-100 text-green-800
+                            {% elif task.priority == 'alta' %} bg-orange-100 text-orange-800
+                            {% elif task.priority == 'urgente' %} bg-red-100 text-red-800
+                            {% endif %}">
+                            {{ task.get_priority_display }}
+                        </span>
+                    </p>
                 </div>
-                <div class="flex gap-2">
-                    <button class="flex-1 text-orange-500 hover:bg-orange-50 py-2 rounded">Editar</button>
-                    <button class="flex-1 text-red-500 hover:bg-red-50 py-2 rounded">Deletar</button>
-                </div>
-            </div>
-
-            <!-- Task Card 2 -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Implementar autenticação</h3>
-                    <span class="inline-block bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-semibold">Pendente</span>
-                </div>
-                <div class="space-y-2 mb-4">
-                    <p class="text-sm text-gray-600"><strong>Responsável:</strong> João Silva</p>
-                    <p class="text-sm text-gray-600"><strong>Vencimento:</strong> 2024-12-10</p>
-                    <p class="text-sm"><span class="inline-block bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold">Urgente</span></p>
-                </div>
-                <div class="flex gap-2">
-                    <button class="flex-1 text-orange-500 hover:bg-orange-50 py-2 rounded">Editar</button>
-                    <button class="flex-1 text-red-500 hover:bg-red-50 py-2 rounded">Deletar</button>
+                <div class="flex gap-2 w-full mt-4">
+                    <a href="{% url 'tasks:detail' task.pk %}" class="w-full text-center bg-gray-100 text-gray-700 hover:bg-gray-200 font-semibold py-2 rounded transition">Acessar Tarefa</a>
                 </div>
             </div>
-
-            <!-- Task Card 3 -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Testes de usabilidade</h3>
-                    <span class="inline-block bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold">Concluída</span>
-                </div>
-                <div class="space-y-2 mb-4">
-                    <p class="text-sm text-gray-600"><strong>Responsável:</strong> Pedro Oliveira</p>
-                    <p class="text-sm text-gray-600"><strong>Vencimento:</strong> 2024-12-08</p>
-                    <p class="text-sm"><span class="inline-block bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-semibold">Média Prioridade</span></p>
-                </div>
-                <div class="flex gap-2">
-                    <button class="flex-1 text-orange-500 hover:bg-orange-50 py-2 rounded">Editar</button>
-                    <button class="flex-1 text-red-500 hover:bg-red-50 py-2 rounded">Deletar</button>
-                </div>
+            {% empty %}
+            <div class="bg-white rounded-lg shadow-md p-6 text-center text-gray-500">
+                Nenhuma tarefa encontrada.
             </div>
+            {% endfor %}
         </div>
     </div>
 

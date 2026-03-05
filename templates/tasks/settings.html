@@ -122,66 +122,79 @@
                     <!-- Settings Form -->
                     <div class="lg:col-span-2">
                         <div class="bg-white rounded-lg shadow-md p-6">
-                            <form class="space-y-6">
+                            <form method="POST" class="space-y-6">
+                                {% csrf_token %}
                                 <!-- Name Input -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        Nome Completo
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value="Usuário"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                    >
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">Nome</label>
+                                        <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    </div>
+                                    <div>
+                                        <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">Sobrenome</label>
+                                        <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    </div>
                                 </div>
 
                                 <!-- Email Input -->
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        Email
-                                    </label>
-                                    <input
-                                        type="email"
-                                        value="usuario@email.com"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                    >
+                                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                    <input type="email" id="email" name="email" value="{{ user.email }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
                                 </div>
 
                                 <!-- Phone Input -->
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        Telefone
-                                    </label>
-                                    <input
-                                        type="tel"
-                                        placeholder="(00) 00000-0000"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                    >
+                                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Telefone</label>
+                                    <input type="tel" id="phone" name="phone" value="{{ user_profile.phone }}" placeholder="(00) 00000-0000" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
                                 </div>
 
-                                <!-- Department Select -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        Departamento
-                                    </label>
-                                    <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                                        <option>Desenvolvimento</option>
-                                        <option>Design</option>
-                                        <option>Marketing</option>
-                                        <option>Vendas</option>
-                                    </select>
+                                <!-- Endereço via CEP -->
+                                <div class="pt-6 border-t border-gray-200">
+                                    <h4 class="text-lg font-bold text-gray-900 mb-4">🏠 Endereço Completo</h4>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                        <div class="md:col-span-1">
+                                            <label for="cep" class="block text-sm font-medium text-gray-700 mb-2">CEP</label>
+                                            <input type="text" id="cep" name="cep" value="{{ user_profile.cep }}" placeholder="00000-000" maxlength="9" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                            <p id="cep-error" class="hidden text-red-500 text-xs mt-1">CEP inválido ou não encontrado.</p>
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label for="logradouro" class="block text-sm font-medium text-gray-700 mb-2">Rua / Logradouro</label>
+                                            <input type="text" id="logradouro" name="logradouro" value="{{ user_profile.logradouro }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                        <div class="md:col-span-1">
+                                            <label for="numero" class="block text-sm font-medium text-gray-700 mb-2">Número</label>
+                                            <input type="text" id="numero" name="numero" value="{{ user_profile.numero }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label for="complemento" class="block text-sm font-medium text-gray-700 mb-2">Complemento</label>
+                                            <input type="text" id="complemento" name="complemento" value="{{ user_profile.complemento }}" placeholder="Apto, Bloco, etc." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div class="md:col-span-1">
+                                            <label for="bairro" class="block text-sm font-medium text-gray-700 mb-2">Bairro</label>
+                                            <input type="text" id="bairro" name="bairro" value="{{ user_profile.bairro }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50">
+                                        </div>
+                                        <div class="md:col-span-1">
+                                            <label for="cidade" class="block text-sm font-medium text-gray-700 mb-2">Cidade</label>
+                                            <input type="text" id="cidade" name="cidade" value="{{ user_profile.cidade }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50">
+                                        </div>
+                                        <div class="md:col-span-1">
+                                            <label for="estado" class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                                            <input type="text" id="estado" name="estado" value="{{ user_profile.estado }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50">
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Bio Textarea -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        Biografia
-                                    </label>
-                                    <textarea
-                                        rows="4"
-                                        placeholder="Conte um pouco sobre você..."
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                    ></textarea>
+                                <div class="pt-6 border-t border-gray-200">
+                                    <label for="bio" class="block text-sm font-medium text-gray-700 mb-2">Biografia</label>
+                                    <textarea id="bio" name="bio" rows="4" placeholder="Conte um pouco sobre você..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">{{ user_profile.bio }}</textarea>
                                 </div>
 
                                 <!-- Save Button -->
@@ -208,5 +221,55 @@
     </div>
 
     <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cepInput = document.getElementById('cep');
+            const logradouroInput = document.getElementById('logradouro');
+            const bairroInput = document.getElementById('bairro');
+            const cidadeInput = document.getElementById('cidade');
+            const estadoInput = document.getElementById('estado');
+            const numeroInput = document.getElementById('numero');
+            const errorMsg = document.getElementById('cep-error');
+
+            cepInput.addEventListener('blur', function() {
+                let cep = cepInput.value.replace(/\D/g, '');
+                if (cep.length === 8) {
+                    errorMsg.classList.add('hidden');
+                    
+                    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.erro) {
+                                errorMsg.classList.remove('hidden');
+                                errorMsg.innerText = "CEP não encontrado.";
+                            } else {
+                                logradouroInput.value = data.logradouro;
+                                bairroInput.value = data.bairro;
+                                cidadeInput.value = data.localidade;
+                                estadoInput.value = data.uf;
+                                numeroInput.focus();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erro ao buscar CEP:', error);
+                            errorMsg.classList.remove('hidden');
+                            errorMsg.innerText = "Erro na requisição. Tente novamente mais tarde.";
+                        });
+                } else if(cep.length > 0) {
+                    errorMsg.classList.remove('hidden');
+                    errorMsg.innerText = "CEP inválido. Deve ter 8 dígitos.";
+                }
+            });
+            
+            // Mascara simples para CEP
+            cepInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 5) {
+                    value = value.substring(0, 5) + '-' + value.substring(5, 8);
+                }
+                e.target.value = value;
+            });
+        });
+    </script>
 </body>
 </html>
