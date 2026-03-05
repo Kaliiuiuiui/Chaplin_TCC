@@ -1,0 +1,33 @@
+{% extends "shared/base_dashboard.html" %}
+{% block title %}Desativar 2FA - Chaplin{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto px-4 py-20">
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-red-200 dark:border-red-900/50 shadow-sm p-8 text-center">
+        <div class="w-14 h-14 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-5">
+            <svg class="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>
+            </svg>
+        </div>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Desativar Autenticação em Dois Fatores</h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Confirme sua senha atual para desativar o 2FA. Isso tornará sua conta menos segura.</p>
+
+        {% if error %}
+        <div class="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-3 rounded-lg text-sm text-red-700 dark:text-red-300 mb-4 text-left">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+            <div class="text-left">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Senha atual</label>
+                <input type="password" name="password" autofocus required
+                    placeholder="Digite sua senha"
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+            </div>
+            <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-lg transition">
+                Desativar 2FA
+            </button>
+        </form>
+        <a href="{% url 'tasks:settings' %}" class="block text-center text-sm text-gray-400 hover:text-orange-500 mt-4 transition">Cancelar</a>
+    </div>
+</div>
+{% endblock %}

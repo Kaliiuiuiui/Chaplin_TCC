@@ -5,76 +5,164 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Chaplin - Plataforma de Tarefas{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configure Tailwind to use class-based dark mode
+        tailwind.config = { darkMode: 'class' }
+    </script>
     <link rel="stylesheet" href="/static/css/styles.css">
+
+    <!-- Apply saved theme BEFORE paint to avoid flash -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem('chaplin-theme');
+            if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 dark:bg-gray-950 transition-colors duration-200">
+
     <!-- Top Navigation -->
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <nav class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 shadow-sm">
         <div class="px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center gap-4">
-                    <button id="sidebar-toggle" class="md:hidden text-gray-700 hover:text-orange-500 transition">
+                    <button id="sidebar-toggle" class="md:hidden text-gray-700 dark:text-gray-300 hover:text-orange-500 transition">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
                     </button>
                     <a href="{% url 'tasks:dashboard' %}" class="text-2xl font-bold text-orange-500">Chaplin</a>
                 </div>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
+
+                    <!-- Dark Mode Toggle -->
+                    <button id="theme-toggle" title="Alternar tema"
+                        class="w-9 h-9 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <!-- Sun icon (shown in dark mode) -->
+                        <svg id="icon-sun" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+                        </svg>
+                        <!-- Moon icon (shown in light mode) -->
+                        <svg id="icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                        </svg>
+                    </button>
+
                     <!-- Notificações -->
-                    <button class="text-gray-700 hover:text-orange-500 transition relative">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {% with unread_count=request.user.notifications.filter.count %}
+                    <a href="{% url 'tasks:notifications' %}" id="notification-bell"
+                        class="relative text-gray-600 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                        title="Notificações">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                         </svg>
-                        <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-                    </button>
-                    
+                        <span id="notif-badge" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full hidden items-center justify-center px-1"></span>
+                    </a>
+                    {% endwith %}
+
                     <!-- Perfil -->
                     <div class="relative flex items-center gap-3">
                         <div class="text-right hidden sm:block">
-                            <p class="text-sm font-semibold text-gray-900">{{ user.first_name|default:user.username }}</p>
-                            <p class="text-xs text-gray-600">{{ user.profile.get_role_display }}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ user.first_name|default:user.username }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ user.profile.get_role_display }}</p>
                         </div>
-                        <div id="user-menu-button" class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold cursor-pointer hover:bg-orange-600 transition">
+                        <div id="user-menu-button" class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold cursor-pointer hover:bg-orange-600 transition select-none">
                             {{ user.first_name|first|upper|default:"U" }}
                         </div>
-                        
+
                         <!-- Dropdown Menu -->
-                        <div id="user-dropdown-menu" class="hidden absolute right-0 top-12 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
-                            <div class="px-4 py-2 border-b border-gray-100 sm:hidden">
-                                <p class="text-sm font-semibold text-gray-900">{{ user.first_name|default:user.username }}</p>
-                                <p class="text-xs text-gray-600">{{ user.profile.get_role_display }}</p>
+                        <div id="user-dropdown-menu" class="hidden absolute right-0 top-12 w-52 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-2 z-50">
+                            <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700 sm:hidden">
+                                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ user.first_name|default:user.username }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ user.profile.get_role_display }}</p>
                             </div>
-                            <a href="{% url 'tasks:settings' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600">Configurações</a>
+                            <a href="{% url 'tasks:settings' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-700 hover:text-orange-600 dark:hover:text-orange-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                Configurações
+                            </a>
+                            <a href="{% url 'tasks:notifications' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-700 hover:text-orange-600 dark:hover:text-orange-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                                Notificações
+                            </a>
                             {% if user.profile.role == 'admin' %}
-                            <a href="{% url 'users:admin_users_list' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600">Gestão de Contas</a>
+                            <a href="{% url 'users:admin_users_list' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-700 hover:text-orange-600 dark:hover:text-orange-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                Gestão de Contas
+                            </a>
                             {% endif %}
-                            <div class="border-t border-gray-100 my-1"></div>
-                            <a href="{% url 'users:logout' %}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">Sair da Conta</a>
+                            <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+                            <a href="{% url 'users:logout' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                Sair da Conta
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
-    
+
     <script>
-        // User Menu Toggle
         document.addEventListener('DOMContentLoaded', function() {
+            // ── User Menu ──────────────────────────────────────────────
             const userBtn = document.getElementById('user-menu-button');
             const userMenu = document.getElementById('user-dropdown-menu');
-
             if (userBtn && userMenu) {
                 userBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     userMenu.classList.toggle('hidden');
                 });
-
                 document.addEventListener('click', function(e) {
                     if (!userMenu.contains(e.target) && !userBtn.contains(e.target)) {
                         userMenu.classList.add('hidden');
                     }
                 });
+            }
+
+            // ── Theme Toggle ───────────────────────────────────────────
+            const html = document.documentElement;
+            const themeBtn = document.getElementById('theme-toggle');
+            const iconSun = document.getElementById('icon-sun');
+            const iconMoon = document.getElementById('icon-moon');
+
+            function applyTheme(isDark) {
+                if (isDark) {
+                    html.classList.add('dark');
+                    iconSun.classList.remove('hidden');
+                    iconMoon.classList.add('hidden');
+                    localStorage.setItem('chaplin-theme', 'dark');
+                } else {
+                    html.classList.remove('dark');
+                    iconSun.classList.add('hidden');
+                    iconMoon.classList.remove('hidden');
+                    localStorage.setItem('chaplin-theme', 'light');
+                }
+            }
+
+            // Sync icons with current theme on load
+            applyTheme(html.classList.contains('dark'));
+
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    applyTheme(!html.classList.contains('dark'));
+                });
+            }
+
+            // ── Notification Badge ─────────────────────────────────────
+            const badge = document.getElementById('notif-badge');
+            if (badge) {
+                fetch('/tasks/notificacoes/count/')
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.count > 0) {
+                            badge.textContent = data.count > 99 ? '99+' : data.count;
+                            badge.style.display = 'flex';
+                            badge.classList.remove('hidden');
+                        }
+                    })
+                    .catch(() => {});
             }
         });
     </script>
@@ -82,11 +170,11 @@
     <!-- Main Container -->
     <div class="flex min-h-[calc(100vh-64px)]">
         <!-- Sidebar -->
-        <aside id="sidebar" class="fixed md:static left-0 top-16 md:top-0 w-64 md:min-h-[calc(100vh-64px)] bg-gray-900 text-white transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-40 flex flex-col">
-            <nav class="p-6 space-y-2 flex-grow overflow-y-auto">
+        <aside id="sidebar" class="fixed md:static left-0 top-16 md:top-0 w-64 md:min-h-[calc(100vh-64px)] bg-gray-900 dark:bg-gray-950 text-white transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-40 flex flex-col border-r border-gray-800 dark:border-gray-800">
+            <nav class="p-4 space-y-1 flex-grow overflow-y-auto">
                 <!-- Dashboard -->
-                <a href="{% url 'tasks:dashboard' %}" class="flex items-center gap-3 px-4 py-3 rounded-lg {% if request.resolver_match.url_name == 'dashboard' %}bg-orange-500{% else %}hover:bg-gray-800{% endif %} transition">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <a href="{% url 'tasks:dashboard' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium {% if request.resolver_match.url_name == 'dashboard' %}bg-orange-500 text-white{% else %}text-gray-300 hover:bg-gray-800 hover:text-white{% endif %} transition">
+                    <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4z"></path>
                         <path fill-rule="evenodd" d="M3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm8-1a1 1 0 00-1 1v6a1 1 0 001 1h4a1 1 0 001-1v-6a1 1 0 00-1-1h-4z" clip-rule="evenodd"></path>
                     </svg>
@@ -94,8 +182,8 @@
                 </a>
 
                 <!-- Tarefas -->
-                <a href="{% url 'tasks:list' %}" class="flex items-center gap-3 px-4 py-3 rounded-lg {% if request.resolver_match.url_name == 'list' %}bg-orange-500{% else %}hover:bg-gray-800{% endif %} transition">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <a href="{% url 'tasks:list' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium {% if request.resolver_match.url_name == 'list' %}bg-orange-500 text-white{% else %}text-gray-300 hover:bg-gray-800 hover:text-white{% endif %} transition">
+                    <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
                         <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H3a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V6a1 1 0 00-1-1h-3a1 1 0 000-2 2 2 0 00-2-2H4zm9.6 5.2a1 1 0 00-1.4-1.4L9 10.6 7.4 9a1 1 0 00-1.4 1.4l2 2a1 1 0 001.4 0l4.2-4.2z" clip-rule="evenodd"></path>
                     </svg>
@@ -103,24 +191,24 @@
                 </a>
 
                 <!-- Nova Tarefa -->
-                <a href="{% url 'tasks:create' %}" class="flex items-center gap-3 px-4 py-3 rounded-lg {% if request.resolver_match.url_name == 'create' %}bg-orange-500{% else %}hover:bg-gray-800{% endif %} transition">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <a href="{% url 'tasks:create' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium {% if request.resolver_match.url_name == 'create' %}bg-orange-500 text-white{% else %}text-gray-300 hover:bg-gray-800 hover:text-white{% endif %} transition">
+                    <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
                     </svg>
                     <span>Nova Tarefa</span>
                 </a>
 
                 <!-- Kanban -->
-                <a href="{% url 'tasks:kanban' %}" class="flex items-center gap-3 px-4 py-3 rounded-lg {% if request.resolver_match.url_name == 'kanban' %}bg-orange-500{% else %}hover:bg-gray-800{% endif %} transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="{% url 'tasks:kanban' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium {% if request.resolver_match.url_name == 'kanban' %}bg-orange-500 text-white{% else %}text-gray-300 hover:bg-gray-800 hover:text-white{% endif %} transition">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path>
                     </svg>
                     <span>Kanban</span>
                 </a>
 
                 <!-- Calendário -->
-                <a href="{% url 'tasks:calendar' %}" class="flex items-center gap-3 px-4 py-3 rounded-lg {% if request.resolver_match.url_name == 'calendar' %}bg-orange-500{% else %}hover:bg-gray-800{% endif %} transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="{% url 'tasks:calendar' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium {% if request.resolver_match.url_name == 'calendar' %}bg-orange-500 text-white{% else %}text-gray-300 hover:bg-gray-800 hover:text-white{% endif %} transition">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                     </svg>
                     <span>Calendário</span>
@@ -128,8 +216,8 @@
 
                 {% if user.profile.role == 'gestor' or user.profile.role == 'admin' %}
                 <!-- Áreas do Prédio -->
-                <a href="{% url 'tasks:area_list' %}" class="flex items-center gap-3 px-4 py-3 rounded-lg {% if request.resolver_match.url_name == 'area_list' or request.resolver_match.url_name == 'area_create' or request.resolver_match.url_name == 'area_edit' %}bg-orange-500{% else %}hover:bg-gray-800{% endif %} transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="{% url 'tasks:area_list' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium {% if request.resolver_match.url_name == 'area_list' or request.resolver_match.url_name == 'area_create' or request.resolver_match.url_name == 'area_edit' %}bg-orange-500 text-white{% else %}text-gray-300 hover:bg-gray-800 hover:text-white{% endif %} transition">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                     </svg>
                     <span>Áreas do Prédio</span>
@@ -137,29 +225,29 @@
                 {% endif %}
 
                 <!-- Divisor -->
-                <div class="border-t border-gray-700 my-4"></div>
+                <div class="border-t border-gray-700 dark:border-gray-800 my-3"></div>
 
                 {% if user.profile.role == 'admin' %}
                 <!-- Admin Users -->
-                <a href="{% url 'users:admin_users_list' %}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition">
-                    <svg class="w-5 h-5 text-orange-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                <a href="{% url 'users:admin_users_list' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition">
+                    <svg class="w-5 h-5 shrink-0 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
                     <span>Gestão de Contas</span>
                 </a>
                 {% endif %}
 
                 <!-- Configurações -->
-                <a href="{% url 'tasks:settings' %}" class="flex items-center gap-3 px-4 py-3 rounded-lg {% if request.resolver_match.url_name == 'settings' %}bg-orange-500{% else %}hover:bg-gray-800{% endif %} transition">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <a href="{% url 'tasks:settings' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium {% if request.resolver_match.url_name == 'settings' %}bg-orange-500 text-white{% else %}text-gray-300 hover:bg-gray-800 hover:text-white{% endif %} transition">
+                    <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
                     </svg>
                     <span>Configurações</span>
                 </a>
 
                 <!-- Logout -->
-                <a href="{% url 'users:logout' %}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-600 transition text-red-400 hover:text-white">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <a href="{% url 'users:logout' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-600 hover:text-white transition">
+                    <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"></path>
                     </svg>
                     <span>Sair</span>
@@ -167,15 +255,15 @@
             </nav>
 
             <!-- Informações do Usuário (Rodapé da Sidebar) -->
-            <div class="p-6 border-t border-gray-700 bg-gray-800 shrink-0">
+            <div class="p-4 border-t border-gray-700 dark:border-gray-800 bg-gray-800 dark:bg-gray-900 shrink-0">
                 <p class="text-xs text-gray-400">Logado como</p>
                 <p class="text-sm font-semibold text-white">{{ user.username }}</p>
-                <p class="text-xs text-gray-400 mt-1">{{ user.profile.get_role_display }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">{{ user.profile.get_role_display }}</p>
             </div>
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 w-full bg-gray-50 flex flex-col">
+        <main class="flex-1 w-full min-w-0 bg-gray-50 dark:bg-gray-950 flex flex-col transition-colors duration-200">
             {% block content %}{% endblock %}
         </main>
     </div>
@@ -194,12 +282,13 @@
                 sidebar.classList.toggle('-translate-x-full');
                 overlay.classList.toggle('hidden');
             });
-
             overlay.addEventListener('click', () => {
                 sidebar.classList.add('-translate-x-full');
                 overlay.classList.add('hidden');
             });
         }
     </script>
+
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

@@ -20,4 +20,8 @@ urlpatterns = [
     path('areas/nova/', views.area_create_view, name='area_create'),
     path('areas/<int:pk>/editar/', views.area_edit_view, name='area_edit'),
     path('areas/<int:pk>/excluir/', views.area_delete_view, name='area_delete'),
+    # Notificações
+    path('notificacoes/', views.notifications_view, name='notifications'),
+    path('notificacoes/<int:pk>/lida/', views.mark_notification_read, name='notification_read'),
+    path('notificacoes/count/', views.unread_notifications_count, name='notifications_count'),
 ]

@@ -58,6 +58,10 @@ class UserProfile(models.Model):
     cidade = models.CharField(max_length=100, blank=True)
     estado = models.CharField(max_length=2, blank=True)
 
+    # Autenticação de Dois Fatores (2FA)
+    two_factor_enabled = models.BooleanField(default=False, verbose_name='2FA Ativo')
+    totp_secret = models.CharField(max_length=64, blank=True, verbose_name='Chave TOTP')
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

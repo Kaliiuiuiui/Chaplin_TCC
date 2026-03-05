@@ -1,10 +1,23 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import Task, TaskEvidence, Message, AreaPredio
+from .models import Task, TaskEvidence, Message, AreaPredio, Notification
 from .forms import TaskForm
 from apps.users.models import UserProfile
 from django.db.models import Q
+from django.contrib.auth.models import User as AuthUser
+
+
+def _notify(recipient, titulo, mensagem='', tipo='sistema', task=None):
+    """Cria uma notificação para um usuário."""
+    if recipient:
+        Notification.objects.create(
+            recipient=recipient,
+            titulo=titulo,
+            mensagem=mensagem,
+            tipo=tipo,
+            task=task,
+        )
 
 @login_required
 def dashboard_view(request):
@@ -83,6 +96,11 @@ def create_task_view(request):
             task = form.save(commit=False)
             task.created_by = request.user
             task.save()
+            # Notificar gestores sobre nova tarefa (exceto o criador)
+            for user in AuthUser.objects.filter(profile__role__in=['gestor', 'admin']).exclude(pk=request.user.pk):
+                _notify(user, f'Nova tarefa criada: {task.title}',
+                        mensagem=f'Criada por {request.user.get_full_name() or request.user.username}.',
+                        tipo='tarefa_criada', task=task)
             return redirect('tasks:detail', pk=task.pk)
     else:
         form = TaskForm()
@@ -127,6 +145,12 @@ def assign_task_view(request, pk):
         task.assigned_to_id = user_id
         task.status = 'alocada'
         task.save()
+        # Notificar o responsavel alocado
+        if task.assigned_to:
+            _notify(task.assigned_to,
+                    f'Tarefa atribuída: {task.title}',
+                    mensagem=f'Você foi alocado para esta tarefa por {request.user.get_full_name() or request.user.username}.',
+                    tipo='tarefa_atribuida', task=task)
         return redirect('tasks:detail', pk=task.pk)
     
     return render(request, 'tasks/assign.html', {'task': task})
@@ -155,6 +179,12 @@ def complete_task_view(request, pk):
         
         task.status = 'concluida'
         task.save()
+        # Notificar o criador da tarefa sobre conclusão
+        if task.created_by and task.created_by != request.user:
+            _notify(task.created_by,
+                    f'Tarefa concluída: {task.title}',
+                    mensagem=f'Concluída por {request.user.get_full_name() or request.user.username}.',
+                    tipo='tarefa_concluida', task=task)
         return redirect('tasks:detail', pk=task.pk)
     
     return render(request, 'tasks/complete.html', {'task': task})
@@ -166,10 +196,48 @@ def add_message_view(request, pk):
     
     if request.method == 'POST':
         content = request.POST.get('content')
-        Message.objects.create(task=task, sender=request.user, content=content)
+        if content:
+            Message.objects.create(task=task, sender=request.user, content=content)
+            # Notificar o responsavel e o criador (exceto o remetente)
+            recipients = set()
+            if task.assigned_to and task.assigned_to != request.user:
+                recipients.add(task.assigned_to)
+            if task.created_by and task.created_by != request.user:
+                recipients.add(task.created_by)
+            for recipient in recipients:
+                _notify(recipient,
+                        f'Nova mensagem em: {task.title}',
+                        mensagem=f'{request.user.get_full_name() or request.user.username}: {content[:80]}',
+                        tipo='nova_mensagem', task=task)
         return redirect('tasks:detail', pk=task.pk)
     
     return render(request, 'tasks/message.html', {'task': task})
+
+
+@login_required
+def notifications_view(request):
+    """Lista todas as notificações do usuário logado."""
+    notifications = Notification.objects.filter(recipient=request.user)
+    # Marcar todas como lidas ao abrir a página
+    notifications.filter(lida=False).update(lida=True)
+    return render(request, 'tasks/notifications.html', {'notifications': notifications})
+
+
+@login_required
+def mark_notification_read(request, pk):
+    """Marca uma notificação específica como lida via AJAX."""
+    notif = get_object_or_404(Notification, pk=pk, recipient=request.user)
+    notif.lida = True
+    notif.save()
+    return JsonResponse({'ok': True})
+
+
+@login_required
+def unread_notifications_count(request):
+    """Retorna o número de notificações não lidas do usuário logado."""
+    count = Notification.objects.filter(recipient=request.user, lida=False).count()
+    return JsonResponse({'count': count})
+
 
 @login_required
 def settings_view(request):

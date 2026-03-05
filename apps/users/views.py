@@ -6,6 +6,7 @@ from django.contrib import messages
 from .models import UserProfile, ActivityLog, Especialidade
 from django.db.models import Q
 from django.core.paginator import Paginator
+import pyotp
 
 def login_view(request):
     if request.method == 'POST':
@@ -13,12 +14,95 @@ def login_view(request):
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
+            profile = getattr(user, 'profile', None)
+            if profile and profile.two_factor_enabled and profile.totp_secret:
+                # Store user id in session for 2FA step (don't log in yet)
+                request.session['pre2fa_user_id'] = user.id
+                return redirect('users:two_factor_verify')
             login(request, user)
             return redirect('tasks:dashboard')
         else:
             return render(request, 'users/login.html', {'error': 'Usuário ou senha inválidos. Tente novamente.'})
-            
     return render(request, 'users/login.html')
+
+
+@login_required
+def setup_2fa_view(request):
+    """Exibe o QR code TOTP e pede confirmação do código para ativar 2FA."""
+    profile = request.user.profile
+    # Gerar um novo segredo se não existir
+    if not profile.totp_secret:
+        profile.totp_secret = pyotp.random_base32()
+        profile.save()
+
+    totp = pyotp.TOTP(profile.totp_secret)
+    otp_uri = totp.provisioning_uri(
+        name=request.user.email or request.user.username,
+        issuer_name='Chaplin'
+    )
+
+    error = None
+    if request.method == 'POST':
+        code = request.POST.get('code', '').strip()
+        if totp.verify(code, valid_window=1):
+            profile.two_factor_enabled = True
+            profile.save()
+            messages.success(request, '2FA ativado com sucesso!')
+            return redirect('tasks:settings')
+        else:
+            error = 'Código inválido. Verifique o app autenticador e tente novamente.'
+
+    return render(request, 'users/two_factor_setup.html', {
+        'otp_uri': otp_uri,
+        'secret': profile.totp_secret,
+        'error': error,
+    })
+
+
+@login_required
+def disable_2fa_view(request):
+    """Desativa 2FA após confirmar a senha."""
+    profile = request.user.profile
+    error = None
+    if request.method == 'POST':
+        password = request.POST.get('password', '')
+        user = authenticate(request, username=request.user.username, password=password)
+        if user is not None:
+            profile.two_factor_enabled = False
+            profile.totp_secret = ''
+            profile.save()
+            messages.success(request, '2FA desativado com sucesso.')
+            return redirect('tasks:settings')
+        else:
+            error = 'Senha incorreta. Tente novamente.'
+    return render(request, 'users/two_factor_disable.html', {'error': error})
+
+
+def two_factor_verify_view(request):
+    """Verificação do código TOTP durante o login."""
+    user_id = request.session.get('pre2fa_user_id')
+    if not user_id:
+        return redirect('users:login')
+
+    user = get_object_or_404(User, pk=user_id)
+    profile = getattr(user, 'profile', None)
+    error = None
+
+    if request.method == 'POST':
+        code = request.POST.get('code', '').strip()
+        totp = pyotp.TOTP(profile.totp_secret)
+        if totp.verify(code, valid_window=1):
+            del request.session['pre2fa_user_id']
+            login(request, user)
+            return redirect('tasks:dashboard')
+        else:
+            error = 'Código inválido. Tente novamente.'
+
+    return render(request, 'users/two_factor_verify.html', {
+        'username': user.get_full_name() or user.username,
+        'error': error,
+    })
+
 
 def logout_view(request):
     logout(request)

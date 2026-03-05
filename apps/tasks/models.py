@@ -143,3 +143,32 @@ class Message(models.Model):
         verbose_name = "Mensagem"
         verbose_name_plural = "Mensagens"
         ordering = ['created_at']
+
+
+class Notification(models.Model):
+    """Notificações do sistema para os usuários"""
+
+    TYPE_CHOICES = [
+        ('tarefa_atribuida', 'Tarefa Atribuída'),
+        ('tarefa_concluida', 'Tarefa Concluída'),
+        ('tarefa_finalizada', 'Tarefa Finalizada'),
+        ('nova_mensagem', 'Nova Mensagem'),
+        ('tarefa_criada', 'Tarefa Criada'),
+        ('sistema', 'Sistema'),
+    ]
+
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, blank=True, related_name='notifications')
+    tipo = models.CharField(max_length=30, choices=TYPE_CHOICES, default='sistema')
+    titulo = models.CharField(max_length=200)
+    mensagem = models.TextField(blank=True)
+    lida = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"[{self.get_tipo_display()}] {self.titulo} → {self.recipient.username}"
+
+    class Meta:
+        verbose_name = "Notificação"
+        verbose_name_plural = "Notificações"
+        ordering = ['-created_at']
