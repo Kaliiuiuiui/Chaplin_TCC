@@ -168,19 +168,3 @@ Cores principais:
 - [Plano de Implementação](./CHAPLIN_PLANO_IMPLEMENTACAO.md)
 - [Guia de Banco de Dados](./GUIA_BANCO_DADOS.md)
 
-## 🤝 Contribuindo
-
-Este é um projeto de TCC. Para contribuir:
-
-1. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-2. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-3. Push para a branch (`git push origin feature/AmazingFeature`)
-4. Abra um Pull Request
-
-## 📧 Contato
-
-Para dúvidas sobre o projeto, abra uma issue no GitHub.
-
----
-
-**Desenvolvido como Projeto de TCC - ETEC**
