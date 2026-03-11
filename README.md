@@ -1,240 +1,139 @@
-# Chaplin - Plataforma de Gestão de Tarefas e Colaboração
+# Chaplin — Plataforma de Gestão de Tarefas Predial
 
-**Chaplin** é uma plataforma web moderna para gestão de tarefas, colaboração em equipe e acompanhamento de projetos. Desenvolvida com Django e Tailwind CSS, oferece uma experiência intuitiva e responsiva para equipes de todos os tamanhos.
+**Chaplin** é um sistema web de gerenciamento de tarefas de manutenção predial, desenvolvido como TCC. Permite que gestores criem e acompanhem ordens de serviço, atribuam responsáveis, coletem evidências fotográficas e mantenham comunicação integrada por tarefa.
 
-## 🎯 Características Principais
+---
 
-- **Gestão de Tarefas** - Criar, atualizar e acompanhar tarefas em tempo real
-- **Colaboração em Equipe** - Comunicação integrada entre membros da equipe
-- **Múltiplos Roles** - Admin, Gestor, Líder e Colaborador com permissões específicas
-- **Dashboard Inteligente** - Visualização de estatísticas e tarefas recentes
-- **Evidências de Tarefas** - Anexar arquivos e documentos às tarefas
-- **Responsivo** - Funciona perfeitamente em desktop, tablet e mobile
-- **Autenticação Segura** - Sistema de login com sessões seguras
+## ✅ Funcionalidades Implementadas
+
+| Funcionalidade | Status |
+|---|---|
+| Login / Logout / Registro | ✅ |
+| Sistema de Roles (Admin, Gestor, Líder, Colaborador) | ✅ |
+| RBAC — controle de acesso por role | ✅ |
+| CRUD de Tarefas | ✅ |
+| Alocação de responsável por tarefa | ✅ |
+| Evidências fotográficas (foto + descrição) | ✅ |
+| Comunicação por tarefa (mensagens) | ✅ |
+| Endereço de tarefa via ViaCEP (preenchimento automático) | ✅ |
+| Gestão de Áreas do Prédio | ✅ |
+| Visualização Kanban | ✅ |
+| Visualização em Calendário | ✅ |
+| Sistema de Notificações em tempo real | ✅ |
+| Tema Claro / Escuro (persistente) | ✅ |
+| Autenticação de Dois Fatores — 2FA (TOTP) | ✅ |
+| Painel de Admin — Gestão de Contas | ✅ |
+
+---
 
 ## 🏗️ Estrutura do Projeto
 
 ```
 Chaplin-TCC/
-├── apps/                          # Aplicações Django
-│   ├── core/                      # App principal (home, docs, demo)
-│   ├── tasks/                     # App de tarefas
-│   └── users/                     # App de usuários
-├── chaplin_project/               # Configurações do projeto
-│   ├── settings.py               # Configurações principais
-│   ├── urls.py                   # URLs principais
-│   └── wsgi.py                   # WSGI para produção
-├── templates/                     # Templates HTML
-│   ├── shared/                   # Templates compartilhados
-│   ├── core/                     # Templates da app core
-│   ├── tasks/                    # Templates da app tasks
-│   └── users/                    # Templates da app users
-├── static/                        # Arquivos estáticos
-│   ├── css/
-│   ├── js/
-│   ├── images/
-│   ├── docs/
-│   ├── downloads/
-│   └── slides/
+├── apps/
+│   ├── core/              # Home, landing page
+│   ├── tasks/             # Tarefas, notificações, áreas
+│   │   ├── models.py      # Task, Notification, AreaPredio, TaskEvidence, Message
+│   │   ├── views.py       # Toda a lógica de negócio
+│   │   ├── forms.py       # Formulários Django
+│   │   └── urls.py        # Rotas de tarefas
+│   └── users/
+│       ├── models.py      # UserProfile (role, 2FA, especialidade, endereço)
+│       ├── views.py       # Login, 2FA, perfil, admin de contas
+│       └── urls.py        # Rotas de usuários
+├── templates/
+│   ├── shared/
+│   │   └── base_dashboard.html   # Layout base (navbar, sidebar, toggle tema)
+│   ├── tasks/                    # Todos os HTMLs de tarefas
+│   └── users/                    # Login, 2FA, admin de contas
+├── static/
+│   ├── css/styles.css
+│   ├── js/main.js
+│   └── docs/              # Documentação auxiliar
+├── chaplin_project/
+│   ├── settings.py
+│   └── urls.py
 ├── manage.py
-├── requirements.txt
-└── db.sqlite3
+├── requirements.txt       # Todas as dependências Python
+└── .env                   # Variáveis de ambiente (NÃO commitar)
 ```
-
-## 🚀 Instalação e Setup
-
-### Pré-requisitos
-
-- Python 3.8+
-- pip
-- Git
-
-### Passo 1: Clonar o Repositório
-
-```bash
-git clone https://github.com/seu-usuario/Chaplin-TCC.git
-cd Chaplin-TCC
-```
-
-### Passo 2: Criar Ambiente Virtual
-
-```bash
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-```
-
-### Passo 3: Instalar Dependências
-
-```bash
-pip install -r requirements.txt
-```
-
-### Passo 4: Executar Migrações
-
-```bash
-python manage.py migrate
-```
-
-### Passo 5: Criar Usuário Admin
-
-```bash
-python manage.py createsuperuser
-```
-
-### Passo 6: Executar Servidor
-
-```bash
-python manage.py runserver
-```
-
-Acesse: http://localhost:8000
-
-## 📋 Credenciais de Teste
-
-| Usuário | Senha | Role |
-|---------|-------|------|
-| admin | admin123 | Admin |
-| gestor | gestor123 | Gestor |
-| lider | lider123 | Líder |
-| colaborador | colaborador123 | Colaborador |
-
-## 👥 Roles e Permissões
-
-### Admin
-- Acesso total ao sistema
-- Gerenciar usuários
-- Visualizar relatórios
-- Configurar sistema
-
-### Gestor
-- Criar e gerenciar tarefas
-- Atribuir tarefas a líderes
-- Visualizar progresso
-- Gerar relatórios
-
-### Líder
-- Alocar tarefas a colaboradores
-- Acompanhar progresso
-- Comunicar com equipe
-- Visualizar evidências
-
-### Colaborador
-- Executar tarefas atribuídas
-- Enviar evidências
-- Comunicar com líder
-- Visualizar tarefas
-
-## 🌐 URLs Principais
-
-### Públicas
-- `/` - Home
-- `/docs/` - Documentação
-- `/demo/` - Demonstração
-- `/slides/` - Apresentação TCC
-- `/resources/` - Recursos
-- `/sitemap/` - Mapa do Site
-- `/users/login/` - Login
-- `/users/register/` - Registro
-
-### Autenticadas
-- `/tasks/dashboard/` - Dashboard
-- `/tasks/list/` - Lista de Tarefas
-- `/tasks/create/` - Nova Tarefa
-- `/tasks/<id>/` - Detalhe da Tarefa
-- `/tasks/settings/` - Configurações
-- `/admin/` - Painel Administrativo
-
-## 🛠️ Tecnologias Utilizadas
-
-### Backend
-- **Django 4.2+** - Framework web
-- **Django ORM** - Mapeamento objeto-relacional
-- **SQLite** - Banco de dados (desenvolvimento)
-- **Python 3.8+** - Linguagem de programação
-
-### Frontend
-- **HTML5** - Marcação
-- **Tailwind CSS 4** - Estilização
-- **JavaScript Vanilla** - Interatividade
-
-## 📊 Modelos de Dados
-
-### User (Django)
-- username
-- email
-- password
-- first_name
-- last_name
-
-### UserProfile
-- user (ForeignKey)
-- role (admin, gestor, lider, colaborador)
-- phone
-- department
-
-### Task
-- title
-- description
-- priority (baixa, média, alta)
-- status (aberta, alocada, em_progresso, concluída)
-- assigned_to (ForeignKey User)
-- created_by (ForeignKey User)
-- due_date
-
-### TaskEvidence
-- task (ForeignKey Task)
-- user (ForeignKey User)
-- file
-- description
-
-### Message
-- sender (ForeignKey User)
-- task (ForeignKey Task)
-- content
-
-## 🔐 Segurança
-
-- **CSRF Protection** - Proteção contra ataques CSRF
-- **SQL Injection Prevention** - Uso de ORM Django
-- **XSS Prevention** - Escapamento automático
-- **Password Hashing** - Senhas criptografadas
-- **Session Security** - Sessões seguras
-
-## 🐛 Troubleshooting
-
-### Erro: "No module named 'apps'"
-Certifique-se de que está no diretório raiz e o ambiente virtual está ativado.
-
-### Erro: "Table doesn't exist"
-Execute as migrações:
-```bash
-python manage.py migrate
-```
-
-### Erro: "Static files not found"
-Colete os arquivos estáticos:
-```bash
-python manage.py collectstatic --noinput
-```
-
-## 📚 Documentação Adicional
-
-- [Arquitetura Técnica](static/docs/ARQUITETURA_TECNICA.md)
-- [Guia de Setup Completo](static/docs/CHAPLIN_DJANGO_SETUP_COMPLETO.md)
-- [Plano de Implementação](static/docs/CHAPLIN_PLANO_IMPLEMENTACAO.md)
-
-## 🤝 Contribuindo
-
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
-5. Abra um Pull Request
-
-## 📄 Licença
-
-Este projeto é licenciado sob a Licença MIT.
 
 ---
 
-**Desenvolvido com ❤️ para melhorar a colaboração em equipe**
+## 🚀 Como Rodar Localmente
+
+> Leia o guia completo em [`static/docs/GUIA_RODAR_LOCALMENTE.md`](static/docs/GUIA_RODAR_LOCALMENTE.md)
+
+**Resumo rápido:**
+```bash
+git clone https://github.com/Kayque-Freitas/Chaplin-TCC.git
+cd Chaplin-TCC
+python -m venv venv
+venv\Scripts\activate          # Windows
+pip install -r requirements.txt
+# Criar .env (veja o guia)
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+```
+Acesse: http://127.0.0.1:8000
+
+---
+
+## 👥 Roles e Permissões
+
+| Role | Criar Tarefa | Alocar | Editar | Ver todos | Admin Contas |
+|---|:---:|:---:|:---:|:---:|:---:|
+| `admin` | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `gestor` | ✅ | ✅ | ✅ | As próprias | ❌ |
+| `lider` | ✅ | ✅ | ✅ | ✅ | ❌ |
+| `colaborador` | ❌ | ❌ | ❌ | Só as suas | ❌ |
+
+---
+
+## 🔐 Segurança
+
+- CSRF Protection (embutida no Django)
+- Senhas com hash (PBKDF2 — padrão Django)
+- 2FA via TOTP (pyotp) — opcional por usuário
+- RBAC server-side (não depende só do front-end)
+
+---
+
+## 🌐 Principais URLs
+
+| Página | URL |
+|---|---|
+| Home | `/` |
+| Login | `/usuarios/login/` |
+| Dashboard | `/tasks/dashboard/` |
+| Lista de Tarefas | `/tasks/lista/` |
+| Nova Tarefa | `/tasks/criar/` |
+| Kanban | `/tasks/kanban/` |
+| Calendário | `/tasks/calendario/` |
+| Notificações | `/tasks/notificacoes/` |
+| Configurações | `/tasks/configuracoes/` |
+| Áreas do Prédio | `/tasks/areas/` |
+| Ativar 2FA | `/usuarios/2fa/configurar/` |
+| Admin de Contas | `/usuarios/admin-panel/usuarios/` |
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+| Camada | Tecnologia |
+|---|---|
+| Backend | Python 3.13, Django 4.2 |
+| Banco de dados | SQLite (dev) |
+| Frontend | HTML5, Tailwind CSS (CDN), JavaScript Vanilla |
+| 2FA | pyotp + qrcode |
+| CEP | API pública ViaCEP |
+| Imagens | Pillow |
+
+---
+
+## 📄 Documentação
+
+- [Guia Completo de Setup](static/docs/GUIA_RODAR_LOCALMENTE.md)
+- [Arquitetura Técnica](static/docs/ARQUITETURA_TECNICA.md)
+- [Resumo para o Grupo](static/docs/RESUMO_GRUPO.md)
